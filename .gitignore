@@ -1,0 +1,9 @@
+.cproject
+.project
+.settings/
+build/
+dependencies.lock
+managed_components/
+sdkconfig
+sdkconfig.old
+
