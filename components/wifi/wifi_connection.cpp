@@ -269,8 +269,10 @@ esp_err_t WifiConnection::wifi_connect(void)
             .password = "",
             .scan_method = WIFI_ALL_CHANNEL_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
-            .threshold.rssi = -127,
-            .threshold.authmode = WIFI_AUTH_OPEN,
+            .threshold = {
+                .rssi = -127,
+                .authmode = WIFI_AUTH_OPEN,
+            },
         },
     };
     return wifi_sta_do_connect(wifi_config, true);
