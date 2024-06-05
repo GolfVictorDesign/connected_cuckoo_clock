@@ -6,11 +6,16 @@
  */
 
 #include <stdio.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "driver/gpio.h"
+
 #include "esp_log.h"
 #include "esp_wifi.h"
+#include "nvs_flash.h"
+
 #include "sdkconfig.h"
 
 #include "wifi/wifi_connection.h"
@@ -18,9 +23,7 @@
 
 extern "C" void app_main(void)
 {
-    WifiConnection wifi;
+    WifiStation station;
 	configure_front_light();
 	update_front_light(45, 0, 60);
-    wifi.wifi_start();
-    wifi.wifi_connect();
 }
