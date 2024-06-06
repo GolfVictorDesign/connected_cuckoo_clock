@@ -18,9 +18,12 @@ class WifiConnection
 
         EventGroupHandle_t  m_wifi_event_group;
 
+        virtual esp_err_t close_connection(void);
+        virtual esp_err_t init_wifi(void) { return esp_wifi_init(&m_wifiConfig); }
+
     public:
-        WifiConnection();
-        ~WifiConnection();
+        WifiConnection(void);
+        ~WifiConnection(void);
 
 
 };
@@ -30,6 +33,7 @@ class WifiStation : WifiConnection
     protected:
 
     public:
+        WifiStation(void);
 
 };
 

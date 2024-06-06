@@ -1,7 +1,9 @@
 .cproject
 .project
 .settings/
+.vs/
 build/
+CMakeSettings.json
 dependencies.lock
 managed_components/
 sdkconfig
