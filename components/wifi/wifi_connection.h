@@ -11,21 +11,21 @@
 class WifiConnection
 {
     protected:
-        const static char*                  m_pNetifDescSta;
-        const static wifi_init_config_t     m_wifiConfig;
+        const static char*                  m_p_netif_desc_station;
+        const static wifi_init_config_t     m_wifi_config;
 
         esp_netif_t*        m_pStaNetif;
 
-        EventGroupHandle_t  m_wifi_event_group;
+        esp_event_handler_instance_t    m_instance_any_id;
+        esp_event_handler_instance_t    m_instance_got_ip;
+        EventGroupHandle_t              m_wifi_event_group;
 
         virtual esp_err_t close_connection(void);
-        virtual esp_err_t init_wifi(void) { return esp_wifi_init(&m_wifiConfig); }
+        virtual esp_err_t init_wifi(void) { return esp_wifi_init(&m_wifi_config); }
 
     public:
         WifiConnection(void);
         ~WifiConnection(void);
-
-
 };
 
 class WifiStation : WifiConnection
