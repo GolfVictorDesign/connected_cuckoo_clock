@@ -25,5 +25,5 @@ extern "C" void app_main(void)
 {
     WifiStation station;
 	configure_front_light();
-	update_front_light(45, 0, 60);
+	/* update_front_light(45, 0, 60); */
 }

@@ -32,7 +32,7 @@ menu "WiFi Configuration"
         help
             password identifier for SAE H2E
 
-    config MAXIMUM_RETRY
+    config WIFI_MAXIMUM_RETRY
         int "Maximum retry"
         default 5
         help

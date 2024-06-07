@@ -26,7 +26,6 @@
 
 #include "wifi_connection.h"
 
-#define CONFIG_WIFI_CONNECTION_MAX_RETRY    4
 
  /* 
   * The event group allows multiple bits for each event, but we only care about two events:
@@ -51,14 +50,16 @@ static void wifi_station_event_handler(
 {
     static uint8_t num_retry = 0;
     EventGroupHandle_t*  p_wifi_event_group;
+    esp_err_t result;
 
     p_wifi_event_group = (EventGroupHandle_t*)event_data;
 
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-        ESP_ERROR_CHECK(esp_wifi_connect());
+        result = esp_wifi_connect();
+        ESP_ERROR_CHECK(result);
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        if (num_retry < CONFIG_WIFI_CONNECTION_MAX_RETRY) {
+        if (num_retry < CONFIG_WIFI_MAXIMUM_RETRY) {
             esp_wifi_connect();
             num_retry++;
             ESP_LOGI("WIFI_station_event", "retry to connect to the AP");
@@ -128,6 +129,42 @@ WifiConnection::~WifiConnection(void)
 
 WifiStation::WifiStation(void)
 {
+
+    wifi_config_t wifi_config = {
+        .sta = {
+            .ssid = CONFIG_WIFI_SSID,
+            .password = CONFIG_WIFI_PASSWORD,
+            /* Authmode threshold resets to WPA2 as default if password matches WPA2 standards (password len => 8).
+             * If you want to connect the device to deprecated WEP/WPA networks, Please set the threshold value
+             * to WIFI_AUTH_WEP/WIFI_AUTH_WPA_PSK and set the password with length and format matching to
+             * WIFI_AUTH_WEP/WIFI_AUTH_WPA_PSK standards.
+             */
+            .threshold = {
+                .authmode = WIFI_AUTH_WPA_WPA2_PSK,
+            },
+            .sae_pwe_h2e = (wifi_sae_pwe_method_t)WPA3_SAE_PWE_UNSPECIFIED,
+            .sae_h2e_identifier = "",
+        },
+    };
+
     m_pStaNetif = esp_netif_create_default_wifi_sta();
     init_wifi();
+
+    esp_event_handler_instance_t instance_any_id;
+    esp_event_handler_instance_t instance_got_ip;
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
+                                                        ESP_EVENT_ANY_ID,
+                                                        &wifi_station_event_handler,
+                                                        NULL,
+                                                        &instance_any_id));
+    ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
+                                                        IP_EVENT_STA_GOT_IP,
+                                                        &wifi_station_event_handler,
+                                                        NULL,
+                                                        &instance_got_ip));
+
+
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
+    ESP_ERROR_CHECK(esp_wifi_start() );
 }
